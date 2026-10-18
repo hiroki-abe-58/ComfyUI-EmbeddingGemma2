@@ -36,6 +36,8 @@ Windows 11、RTX 5090、ComfyUI v0.38.0、torch 2.14.1、transformers 5.20.1、s
 - **実際の ComfyUI キュー**：同梱ワークフロー 3 本のスコア（小数 6 桁）とフレーム順が、別途計算した公式の結果と一致しました。
 - **動画のフレーム**：ComfyUI は通常の動画を浮動小数点で（独自の色差処理で）デコードし、ノードはそのフレームを使います。同じファイルの
   8 ビットデコードとの差は平均約 1.3/255、埋め込みのコサインは 0.9996 です。
+- **クリーンインストール**：新しい ComfyUI v0.38.0、新しい Python 3.12 環境、`git clone`、`pip install -r requirements.txt`、
+  `tools/download_model.py` でのモデル取得（SHA-256 検証）。同梱ワークフロー 3 本の結果は開発環境と同じでした。
 - **CPU テストと CI**：公式のトークナイザーと設定ファイルから作った小さなランダムモデルで実際の処理を CPU 上で実行し、全ノードを
   sentence-transformers の直接呼び出しと比較。CPU での実キューも実行します。
 
@@ -67,6 +69,8 @@ Windows 11、RTX 5090、ComfyUI v0.38.0、torch 2.14.1、transformers 5.20.1、s
 - **動画**は ComfyUI がすべてのフレームを先にメモリへ読み込みます（832 x 480 で 1 フレーム約 4.8 MB）。長い動画は先に切り出すか
   縮小してください。
 - **dtype**：`auto` は対応 GPU なら bfloat16、それ以外は float32。float16 はモデルがオーバーフローするため選べません（モデルカード）。
+- **依存関係**：sentence-transformers 6.1.0 が `huggingface-hub<2.0` を要求するため、新しい ComfyUI 0.38.0 環境に入れると
+  `huggingface-hub` が 2.2.0 から 1.33.0 に下がります（ComfyUI 自体は問題なく動作）。
 
 ## ライセンス
 

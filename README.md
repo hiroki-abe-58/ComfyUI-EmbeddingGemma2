@@ -52,8 +52,12 @@ Windows 11, RTX 5090, ComfyUI v0.38.0, torch 2.14.1, transformers 5.20.1, senten
 - **Video frames:** ComfyUI decodes ordinary videos in floating point with its own chroma handling; the nodes encode exactly those
   frames. An 8-bit decode of the same file differs by about 1.3 / 255 per pixel on average, and its embedding has a cosine similarity
   of 0.9996 with the node's.
-- **CPU tests and CI:** a tiny random model built from the official tokenizer, processor and configuration files runs the real
-  processing on the CPU (tests compare every node with direct sentence-transformers calls), plus a real ComfyUI queue on the CPU.
+- **Clean install:** fresh ComfyUI v0.38.0, fresh Python 3.12 environment, `git clone`, `pip install -r requirements.txt`, the model
+  downloaded with `tools/download_model.py` (SHA-256 verified): the three shipped workflows give the same results as the
+  development environment.
+- **CPU tests and CI** (GitHub Actions; Ubuntu and Windows): a tiny random model built from the official tokenizer, processor and
+  configuration files runs the real processing on the CPU (tests compare every node with direct sentence-transformers calls), plus a
+  real ComfyUI queue on the CPU.
 
 **Not checked:** Linux or macOS with a GPU, AMD / Apple GPUs, other ComfyUI versions, retrieval quality against the model card's
 benchmarks (the pack reproduces the official embeddings; it does not re-evaluate the model).
@@ -101,7 +105,9 @@ a 4 s audio clip 0.1 s (the first call of each kind after loading is slower). Pe
   within the context.
 - **dtype.** `auto` uses bfloat16 on GPUs that support it, otherwise float32. float16 is not offered: the model overflows in float16
   (model card).
-- **Dependencies:** sentence-transformers (with scikit-learn and SciPy) and transformers 5.19 or later.
+- **Dependencies:** sentence-transformers (with scikit-learn and SciPy) and transformers 5.19 or later. sentence-transformers 6.1.0
+  requires `huggingface-hub<2.0`, so installing the requirements into a fresh ComfyUI 0.38.0 environment moves `huggingface-hub`
+  from 2.2.0 to 1.33.0. ComfyUI itself ran normally with it here; check other custom nodes you use if they need 2.x.
 
 ## Licenses
 

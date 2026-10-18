@@ -73,7 +73,22 @@ Wall time per workflow including loading the model: 3.8 - 5.3 s.
 - **Video sampling** needs `fps` and `duration` in the metadata; without them the processor keeps every frame up to its 32-frame
   budget instead of sampling 1 per second. The nodes always pass both.
 
-## 5. Tests without the weights (tiny model)
+## 5. Clean install
+
+Fresh ComfyUI v0.38.0 clone, fresh Python 3.12 virtual environment (torch 2.14.1+cu130, ComfyUI's `requirements.txt`, then this
+pack's `requirements.txt`), `git clone` of this repository into `custom_nodes`, `tools/download_model.py --models-dir
+ComfyUI/models/embeddinggemma` (13 files, 44 s, all SHA-256 verified). The three shipped workflows, unchanged, through the real queue:
+all text outputs (score tables, best labels, frame ranking) identical to the development environment's. Installing this pack's
+requirements moved `huggingface-hub` from 2.2.0 to 1.33.0 (sentence-transformers 6.1.0 requires `<2.0`); ComfyUI ran normally.
+
+## 6. CI
+
+GitHub Actions (`.github/workflows/ci.yml`), CPU only, ComfyUI v0.38.0 at its pinned commit: Ubuntu 24.04 with Python 3.12 /
+torch 2.14.1 and Python 3.10 / torch 2.8.0, Windows with Python 3.12 / torch 2.14.1. Each job fetches the official tokenizer and
+configuration files (no weights, SHA-256 checked), runs ruff, a scan for absolute local paths, the test suite with the references
+required (39 tests, nothing skipped) and the real-queue check with the tiny model. All three jobs passed.
+
+## 7. Tests without the weights (tiny model)
 
 - `tests/` (CPU): ComfyUI value conversion (exact image pixels, video metadata and the official sampler's frame choice, mono 16 kHz
   audio), the runtime against direct sentence-transformers calls for every modality, task and length, the model card's options
