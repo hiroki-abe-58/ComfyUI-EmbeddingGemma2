@@ -59,7 +59,7 @@ Windows 11, RTX 5090, ComfyUI v0.38.0, torch 2.14.1, transformers 5.20.1, senten
   configuration files runs the real processing on the CPU (tests compare every node with direct sentence-transformers calls), plus a
   real ComfyUI queue on the CPU.
 
-**Not checked:** Linux or macOS with a GPU, AMD / Apple GPUs, other ComfyUI versions, retrieval quality against the model card's
+**Not checked:** Linux or macOS with a GPU, AMD / Apple GPUs, other ComfyUI versions with the real model (the CPU tests and the real-queue check also run against ComfyUI v0.41.0 in CI), retrieval quality against the model card's
 benchmarks (the pack reproduces the official embeddings; it does not re-evaluate the model).
 
 ## Install
