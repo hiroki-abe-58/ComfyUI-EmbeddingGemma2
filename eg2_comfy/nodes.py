@@ -156,8 +156,8 @@ class EG2EncodeAudio(io.ComfyNode):
             display_name="EmbeddingGemma 2 Encode Audio",
             category="utils/embeddinggemma",
             description=("One embedding per audio clip of the batch. Channels are averaged to mono and other sample rates are resampled "
-                         "to 16 kHz (the model's rate). Only the first 30 seconds of a clip count: the official processing caps a "
-                         "clip at 750 audio tokens (25 per second); cut longer audio into parts to cover all of it."),
+                         "to 16 kHz (the model's rate). Only the first 30 seconds of a clip count: the official processing truncates "
+                         "audio at 480,000 samples (750 audio tokens); cut longer audio into parts to cover all of it."),
             inputs=[EG2Model.Input("model"), io.Audio.Input("audio"),
                     io.Combo.Input("dimensions", options=DIMENSION_OPTIONS, default="768", tooltip=DIMENSIONS_TOOLTIP)],
             outputs=[EG2Embeddings.Output(display_name="embeddings"), io.String.Output(display_name="report")],

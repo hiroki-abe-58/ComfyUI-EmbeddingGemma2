@@ -97,9 +97,10 @@ a 4 s audio clip 0.1 s (the first call of each kind after loading is slower). Pe
 - **Audio** is averaged to mono; rates other than 16 kHz are resampled with a polyphase filter (`scipy.signal.resample_poly`; the
   model accepts 16 kHz only, and the official usage leaves resampling to the caller). The soundtrack of a `VIDEO` is not used by
   Encode Video; take it with Get Video Components and Encode Audio.
-- **Audio length.** Only the first 30 seconds of a clip affect its embedding: the official processing (transformers 5.20.1) caps
-  a clip at 750 audio tokens, 25 per second (checked: a 60 s clip gives exactly the embedding of its first 30 s). The model card
-  mentions minutes of audio; with this processing, cut longer audio into parts.
+- **Audio length.** Only the first 30 seconds of a clip affect its embedding: the official processing (transformers 5.20.1) passes
+  audio through the Gemma 4 audio feature extractor, whose defaults truncate at 480,000 samples (30 s at 16 kHz), so a clip yields at
+  most 750 audio tokens (checked: a 60 s clip gives exactly the embedding of its first 30 s). The model card mentions minutes of
+  audio; with this processing, cut longer audio into parts.
 - **Context.** The model was trained with an 8,192-token context: an image is 280 tokens, a video frame 140 (32 frames at most),
   a second of audio 25. Text is not truncated by the official processing (a 12,000-word text becomes 12,003 tokens), so keep texts
   within the context.

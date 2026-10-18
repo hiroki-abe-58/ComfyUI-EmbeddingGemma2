@@ -67,7 +67,9 @@ Wall time per workflow including loading the model: 3.8 - 5.3 s.
 
 - **Audio is capped at 30 seconds.** The processor gives 25 audio tokens per second up to 750 tokens: 4 s -> 100, 20 s -> 500,
   60 s / 300 s / 400 s -> 750. A 60 s clip (with a different second half) gives exactly the embedding of its first 30 s
-  (identical vectors); its first 29 s give a different one (cosine 0.998).
+  (identical vectors); its first 29 s give a different one (cosine 0.998). Cause: `EmbeddingGemma2Processor` uses
+  `Gemma4AudioFeatureExtractor`, whose `__call__` defaults are `max_length=480_000` and `truncation=True`. The model card's context
+  table lists about 327 s of audio.
 - **Text is not truncated**: `max_seq_length` is unbounded and a 12,000-word text becomes 12,003 tokens, beyond the 8,192-token
   training context.
 - **Video sampling** needs `fps` and `duration` in the metadata; without them the processor keeps every frame up to its 32-frame
