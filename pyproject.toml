@@ -1,0 +1,25 @@
+[project]
+name = "embeddinggemma2"
+description = "EmbeddingGemma 2 for ComfyUI: Google DeepMind's multimodal embedding model (text, images, video, audio in one 768-d space) for captioning by similarity, ranking generated images and video or audio search, run in-process through sentence-transformers. Bit-identical to the official usage."
+version = "0.1.0"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = ["sentence-transformers>=6.1.0", "transformers>=5.19.0", "scipy"]
+
+[project.urls]
+Repository = "https://github.com/hiroki-abe-58/ComfyUI-EmbeddingGemma2"
+
+[tool.comfy]
+PublisherId = "hiroki-abe-58"
+DisplayName = "EmbeddingGemma 2 for ComfyUI"
+Icon = ""
+
+[tool.ruff]
+line-length = 180
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

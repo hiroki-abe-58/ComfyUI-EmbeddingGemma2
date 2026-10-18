@@ -1,0 +1,91 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# CPU only. The model weights are not downloaded: the tests and the real-queue check build a tiny random EmbeddingGemma 2 from the
+# official tokenizer, processor and configuration files (fetched at the pinned revision, about 37 MB). The trained model is checked
+# outside CI; see docs/VERIFICATION.md.
+env:
+  COMFYUI_REF: v0.38.0
+  COMFYUI_COMMIT: 6b747c0428c343e1417219641db93a4fb7cb69ae
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+        python: ["3.12"]
+        torch: ["2.14.1"]
+        torchvision: ["0.29.1"]
+        include:
+          - os: ubuntu-24.04
+            python: "3.10"
+            torch: "2.8.0"
+            torchvision: "0.23.0"
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: ComfyUI-EmbeddingGemma2
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: ComfyUI checkout (pinned)
+        run: |
+          git -c core.autocrlf=false clone --quiet --depth 1 --branch $env:COMFYUI_REF https://github.com/Comfy-Org/ComfyUI.git refs/ComfyUI
+          if ((git -C refs/ComfyUI rev-parse HEAD) -ne $env:COMFYUI_COMMIT) { throw "ComfyUI commit mismatch" }
+
+      - name: Install (CPU)
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true   # a failing pip must fail the step
+          python -m pip install --upgrade pip
+          # CPU torch first: on Linux ComfyUI's unpinned `torch` requirement would otherwise pull the CUDA build and its libraries
+          pip install torch==${{ matrix.torch }} torchvision==${{ matrix.torchvision }} --index-url https://download.pytorch.org/whl/cpu
+          pip install -r refs/ComfyUI/requirements.txt -r ComfyUI-EmbeddingGemma2/requirements.txt pytest ruff
+          pip list
+
+      - name: Official tokenizer and configuration files (no weights, SHA-256 checked)
+        run: python ComfyUI-EmbeddingGemma2/tools/download_model.py --models-dir refs/embeddinggemma --no-weights
+
+      - name: Lint
+        run: ruff check --no-cache ComfyUI-EmbeddingGemma2
+
+      - name: No absolute local paths in the repository
+        run: |
+          $files = git -C ComfyUI-EmbeddingGemma2 ls-files | Where-Object { $_ -notmatch '\.(png|jpg|webp|gif)$' } | ForEach-Object { Join-Path ComfyUI-EmbeddingGemma2 $_ }
+          $hits = $files | Select-String -Pattern '[A-Za-z]:\\{1,2}[A-Za-z0-9_.-]+\\|/home/[a-z]+/|/Users/[A-Za-z]+/'
+          if ($hits) { $hits | ForEach-Object { "$($_.Path):$($_.LineNumber)" }; throw "absolute local path found" }
+
+      - name: Tests (references required, nothing may be skipped)
+        env:
+          EG2_COMFYUI_DIR: ${{ github.workspace }}/refs/ComfyUI
+          EG2_REFERENCE_FILES: ${{ github.workspace }}/refs/embeddinggemma/embeddinggemma-2
+          EG2_REQUIRE_REFERENCES: "1"
+        run: |
+          Set-Location ComfyUI-EmbeddingGemma2
+          python -m pytest tests -q -rs -p no:cacheprovider -W ignore::DeprecationWarning -W ignore::FutureWarning
+
+      - name: Real ComfyUI queue on CPU (tiny random model)
+        run: |
+          python ComfyUI-EmbeddingGemma2/scripts/ci_queue_check.py --comfyui refs/ComfyUI --reference refs/embeddinggemma/embeddinggemma-2 --workdir queue-logs
+
+      - name: ComfyUI log on failure
+        if: failure()
+        run: |
+          if (Test-Path queue-logs/comfyui.log) { Get-Content queue-logs/comfyui.log -Tail 120 }

@@ -1,0 +1,10 @@
+{
+  "1": {"class_type": "EG2Loader", "inputs": {"model": "embeddinggemma-2", "modalities": "text + image/video", "dtype": "auto", "device": "cuda", "keep_loaded": true}},
+  "2": {"class_type": "LoadVideo", "inputs": {"file": "example.mp4"}},
+  "3": {"class_type": "GetVideoComponents", "inputs": {"video": ["2", 0]}},
+  "4": {"class_type": "EG2EncodeImages", "inputs": {"model": ["1", 0], "images": ["3", 0], "dimensions": "768"}},
+  "5": {"class_type": "EG2EncodeText", "inputs": {"model": ["1", 0], "text": "a close-up of a face looking at the camera", "one_per_line": true, "task": "SearchQuery", "title": "", "dimensions": "768"}},
+  "6": {"class_type": "EG2RankImages", "inputs": {"images": ["3", 0], "image_embeddings": ["4", 0], "query": ["5", 0], "top_k": 4}},
+  "7": {"class_type": "SaveImage", "inputs": {"images": ["6", 0], "filename_prefix": "embeddinggemma/best_frames"}},
+  "8": {"class_type": "PreviewAny", "inputs": {"source": ["6", 1]}}
+}

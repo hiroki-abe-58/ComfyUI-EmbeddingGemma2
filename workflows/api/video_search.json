@@ -1,0 +1,9 @@
+{
+  "1": {"class_type": "EG2Loader", "inputs": {"model": "embeddinggemma-2", "modalities": "all", "dtype": "auto", "device": "cuda", "keep_loaded": true}},
+  "2": {"class_type": "LoadVideo", "inputs": {"file": "example.mp4"}},
+  "3": {"class_type": "EG2EncodeVideo", "inputs": {"model": ["1", 0], "video": ["2", 0], "dimensions": "768"}},
+  "4": {"class_type": "EG2EncodeText", "inputs": {"model": ["1", 0], "text": "an animal in a snowy forest\na boat on the sea\nan aerial view of a river\npeople dancing at a party\na cooking tutorial in a kitchen", "one_per_line": true, "task": "SearchQuery", "title": "", "dimensions": "768"}},
+  "5": {"class_type": "EG2Similarity", "inputs": {"queries": ["3", 0], "candidates": ["4", 0]}},
+  "6": {"class_type": "PreviewAny", "inputs": {"source": ["5", 1]}},
+  "7": {"class_type": "PreviewAny", "inputs": {"source": ["5", 0]}}
+}

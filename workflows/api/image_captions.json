@@ -1,0 +1,9 @@
+{
+  "1": {"class_type": "EG2Loader", "inputs": {"model": "embeddinggemma-2", "modalities": "all", "dtype": "auto", "device": "cuda", "keep_loaded": true}},
+  "2": {"class_type": "LoadImage", "inputs": {"image": "example.png"}},
+  "3": {"class_type": "EG2EncodeImages", "inputs": {"model": ["1", 0], "images": ["2", 0], "dimensions": "768"}},
+  "4": {"class_type": "EG2EncodeText", "inputs": {"model": ["1", 0], "text": "a drawing of a girl with big fox ears and blonde hair\na photo of a city street at night\na red sports car on a race track\na bowl of fruit on a kitchen table\na cat sleeping on a sofa", "one_per_line": true, "task": "SearchQuery", "title": "", "dimensions": "768"}},
+  "5": {"class_type": "EG2Similarity", "inputs": {"queries": ["3", 0], "candidates": ["4", 0]}},
+  "6": {"class_type": "PreviewAny", "inputs": {"source": ["5", 1]}},
+  "7": {"class_type": "PreviewAny", "inputs": {"source": ["5", 0]}}
+}

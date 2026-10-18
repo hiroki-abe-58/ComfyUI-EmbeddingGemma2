@@ -1,0 +1,22 @@
+EmbeddingGemma 2 for ComfyUI
+Copyright (c) 2026 hiroki-abe-58. Licensed under the MIT License (LICENSE).
+
+This node pack is an unofficial integration. It is not affiliated with or endorsed by Google / Google DeepMind, by the
+sentence-transformers or Hugging Face Transformers projects, or by Comfy Org. "Gemma" is a trademark of Google LLC; it is used here
+only to name the model the nodes load.
+
+No third-party code is included in this repository. The nodes call these installed libraries:
+- sentence-transformers (Apache License 2.0)
+- Hugging Face Transformers (Apache License 2.0), which implements EmbeddingGemma 2
+- SciPy (BSD 3-Clause), for resampling audio to 16 kHz
+
+Model (not included)
+--------------------
+No model weights are included or downloaded by the nodes. tools/download_model.py fetches, when you run it, google/embeddinggemma-2
+at a pinned revision. Its model card states the Apache License 2.0 and says that deployments must adhere to the Gemma Prohibited Use
+Policy (https://ai.google.dev/gemma/prohibited_use_policy). Read both before you use the model.
+
+Documentation images
+--------------------
+docs/images/similarity.png shows frames of videos generated for this repository with the Self Gradient Forcing+ model
+(ZihanSu/Self_Gradient_Forcing_Plus, Apache-2.0) and scores computed by these nodes.
